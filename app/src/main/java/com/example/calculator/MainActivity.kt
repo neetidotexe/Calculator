@@ -5,22 +5,22 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.IntegerRes
-import androidx.databinding.DataBindingUtil
-import kotlinx.android.synthetic.main.activity_main.*
+
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var resultText:TextView
+    private lateinit var calculation: Calculation
+
     private var opr:Int=0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //declaring all variables
         resultText= findViewById<TextView>(R.id.text_result)
+        //declaring all variables
         val oneButton = findViewById<Button>(R.id.button_1)
         val twoButton = findViewById<Button>(R.id.button_2)
         val threeButton = findViewById<Button>(R.id.button_3)
@@ -37,18 +37,33 @@ class MainActivity : AppCompatActivity() {
         val divideButton = findViewById<Button>(R.id.button_divide)
         val equalButton = findViewById<Button>(R.id.button_equal)
         val clearBuutton = findViewById<Button>(R.id.button_clear)
+        val decimalButton=findViewById<Button>(R.id.button_decimal)
 
         //Clear Operation
         clearBuutton.setOnClickListener {
             clear()
         }
 
-
         //Operations
         plusButton.setOnClickListener {
             if (resultText.length() <= 0) {
                 val toast = Toast.makeText(this, "can not press + without numbers", Toast.LENGTH_LONG)
                 toast.show()
+            }else if((resultText.text.contains('+'))||
+                (resultText.text.contains('x')) || (resultText.text.contains('/'))) {
+                equal()
+                opr=1
+                resultText.append("+").toString()
+            }else if((resultText.text.contains('-'))){
+                var frq:Int=minusFrequency(resultText.text.toString())
+                if(frq==1){
+                    opr=1
+                    resultText.append("+").toString()
+                }else if(frq==2){
+                    equal()
+                    opr=1
+                    resultText.append("+").toString()
+                }
             } else {
                 opr=1
                 resultText.append("+").toString()
@@ -56,10 +71,22 @@ class MainActivity : AppCompatActivity() {
         }
 
         minusButton.setOnClickListener {
-            if (resultText.length() <= 0) {
-                val toast = Toast.makeText(this, "can not press - without numbers", Toast.LENGTH_LONG)
-                toast.show()
-            } else {
+            if((resultText.text.contains('+'))||
+                (resultText.text.contains('x')) || (resultText.text.contains('/'))) {
+                equal()
+                opr=2
+                resultText.append("-").toString()
+            }else if((resultText.text.contains('-'))){
+                var frq:Int=minusFrequency(resultText.text.toString())
+                if(frq==1){
+                    opr=2
+                    resultText.append("-").toString()
+                }else if(frq==2){
+                    equal()
+                    opr=2
+                    resultText.append("-").toString()
+                }
+            }else {
                 opr=2
                 resultText.append("-").toString()
             }
@@ -69,9 +96,24 @@ class MainActivity : AppCompatActivity() {
             if (resultText.length() <= 0) {
                 val toast = Toast.makeText(this, "can not press * without numbers", Toast.LENGTH_LONG)
                 toast.show()
+            }else if((resultText.text.contains('+')) ||
+                (resultText.text.contains('x')) || (resultText.text.contains('/'))){
+                equal()
+                opr=3
+                resultText.append("x").toString()
+            }else if((resultText.text.contains('-'))){
+                var frq:Int=minusFrequency(resultText.text.toString())
+                if(frq==1){
+                    opr=3
+                    resultText.append("x").toString()
+                }else if(frq==2){
+                    equal()
+                    opr=3
+                    resultText.append("x").toString()
+                }
             } else {
                 opr=3
-                resultText.append("*").toString()
+                resultText.append("x").toString()
             }
         }
 
@@ -79,7 +121,22 @@ class MainActivity : AppCompatActivity() {
             if (resultText.length() <= 0) {
                 val toast = Toast.makeText(this, "can not press / without numbers", Toast.LENGTH_LONG)
                 toast.show()
-            } else {
+            }else if((resultText.text.contains('+')) ||
+                (resultText.text.contains('x')) || (resultText.text.contains('/'))){
+                equal()
+                opr=4
+                resultText.append("/").toString()
+            }else if((resultText.text.contains('-'))){
+                var frq:Int=minusFrequency(resultText.text.toString())
+                if(frq==1){
+                    opr=4
+                    resultText.append("/").toString()
+                }else if(frq==2){
+                    equal()
+                    opr=4
+                    resultText.append("/").toString()
+                }
+            }else {
                 opr=4
                 resultText.append("/").toString()
             }
@@ -91,8 +148,7 @@ class MainActivity : AppCompatActivity() {
                 val toast = Toast.makeText(this, "can not press = without numbers", Toast.LENGTH_LONG)
                 toast.show()
             } else {
-                var result:Int = calculate(resultText.text.toString(),opr)
-                resultText.setText(result.toString())
+                equal()//calling equal method
             }
         }
 
@@ -138,46 +194,41 @@ class MainActivity : AppCompatActivity() {
             resultText.append("0").toString()
         }
 
+        decimalButton.setOnClickListener {
+            resultText.append(".").toString()
+        }
     }
 
-    //calculate the operation
-    fun calculate(expression: String,oprn:Int): Int {
-        val expr1: Int
-        val expr2: Int
-
-        if(opr==1){
-        val index: Int = expression.indexOf('+', 0, true)
-        expr1=expression.substring(0,index).toInt()
-        expr2=expression.substring(index+1,expression.length).toInt()
-        return expr1+expr2
-        }
-
-        else if(opr==2){
-            val index: Int = expression.indexOf('-', 0, true)
-            expr1=expression.substring(0,index).toInt()
-            expr2=expression.substring(index+1,expression.length).toInt()
-            return expr1-expr2
-        }
-
-        else if(opr==3){
-            val index: Int = expression.indexOf('*', 0, true)
-            expr1=expression.substring(0,index).toInt()
-            expr2=expression.substring(index+1,expression.length).toInt()
-            return expr1*expr2
-        }
-
-        else if(opr==4){
-            val index: Int = expression.indexOf('/', 0, true)
-            expr1=expression.substring(0,index).toInt()
-            expr2=expression.substring(index+1,expression.length).toInt()
-            return expr1/expr2
-        }
-        else
-            return 0
-    }
-
-    fun clear() {
+    private fun clear() {
         findViewById<TextView>(R.id.text_result).text = ""
+    }
+
+    private fun equal(){
+        calculation=Calculation(this)
+        var result:Double = calculation.calculate(resultText.text.toString(),opr)
+        resultText.setText(result.toString())
+        }
+
+    private fun minusFrequency(expression:String):Int{
+        var frq:Int=0;
+        for(i in 0..expression.length-1){
+            if (expression[i].equals('-')){
+                    frq=frq+1
+                }
+        }
+        return frq
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putString("resultTextValue",resultText.text.toString())
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        resultText.setText(savedInstanceState.getString("resultTextValue"))
     }
 }
 
