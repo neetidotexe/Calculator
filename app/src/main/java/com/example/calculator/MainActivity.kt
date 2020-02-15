@@ -7,20 +7,19 @@ import android.widget.TextView
 import android.widget.Toast
 
 
-
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var resultText:TextView
-    private lateinit var calculation: Calculation
+    private lateinit var resultText:TextView        //textview to hold the result and operations
+    private lateinit var calculation: Calculation  //object of class Calculation
 
-    private var opr:Int=0
+    private var opr:Int=0                          //this signifies the operation..1:+,2:-,3:*,4:/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         resultText= findViewById<TextView>(R.id.text_result)
-        //declaring all variables
+        //declaring all variables that defines numbers, operations and equals
         val oneButton = findViewById<Button>(R.id.button_1)
         val twoButton = findViewById<Button>(R.id.button_2)
         val threeButton = findViewById<Button>(R.id.button_3)
@@ -39,15 +38,21 @@ class MainActivity : AppCompatActivity() {
         val clearBuutton = findViewById<Button>(R.id.button_clear)
         val decimalButton=findViewById<Button>(R.id.button_decimal)
 
-        //Clear Operation
+        //Clear text view
         clearBuutton.setOnClickListener {
             clear()
         }
 
         //Operations
-        plusButton.setOnClickListener {
-            if (resultText.length() <= 0) {
+        plusButton.setOnClickListener {//addition
+            if (resultText.length() <= 0) {//if operation is pressed before any number
                 val toast = Toast.makeText(this, "can not press + without numbers", Toast.LENGTH_LONG)
+                toast.show()
+            }else if ((resultText.text.endsWith('-',true))||(resultText.text.endsWith('+',true))||
+                (resultText.text.endsWith('x',true))||(resultText.text.endsWith('/',true))||
+                (resultText.text.endsWith('.',true))) {
+                //if two contionuos operations are pressed
+                val toast = Toast.makeText(this, "can not press two operations together", Toast.LENGTH_LONG)
                 toast.show()
             }else if((resultText.text.contains('+'))||
                 (resultText.text.contains('x')) || (resultText.text.contains('/'))) {
@@ -70,31 +75,43 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        minusButton.setOnClickListener {
-            if((resultText.text.contains('+'))||
-                (resultText.text.contains('x')) || (resultText.text.contains('/'))) {
-                equal()
-                opr=2
-                resultText.append("-").toString()
-            }else if((resultText.text.contains('-'))){
-                var frq:Int=minusFrequency(resultText.text.toString())
-                if(frq==1){
-                    opr=2
-                    resultText.append("-").toString()
-                }else if(frq==2){
+        minusButton.setOnClickListener {//subtraction
+                if((resultText.text.contains('+'))||
+                    (resultText.text.contains('x')) || (resultText.text.contains('/'))) {
                     equal()
                     opr=2
                     resultText.append("-").toString()
+                }else if ((resultText.text.endsWith('-',true))||(resultText.text.endsWith('+',true))||
+                    (resultText.text.endsWith('x',true))||(resultText.text.endsWith('/',true))||
+                    (resultText.text.endsWith('.',true))) {
+                    //if two contionuos operations are pressed
+                    val toast = Toast.makeText(this, "can not press two operations together", Toast.LENGTH_LONG)
+                    toast.show()
+                }else if((resultText.text.contains('-'))){
+                    var frq:Int=minusFrequency(resultText.text.toString())
+                    if(frq==1){
+                        opr=2
+                        resultText.append("-").toString()
+                    }else if(frq==2){
+                        equal()
+                        opr=2
+                        resultText.append("-").toString()
+                    }
+                }else {
+                    opr=2
+                    resultText.append("-").toString()
                 }
-            }else {
-                opr=2
-                resultText.append("-").toString()
-            }
         }
 
-        multiplyButton.setOnClickListener {
+        multiplyButton.setOnClickListener {//multiplication
             if (resultText.length() <= 0) {
                 val toast = Toast.makeText(this, "can not press * without numbers", Toast.LENGTH_LONG)
+                toast.show()
+            }else if ((resultText.text.endsWith('-',true))||(resultText.text.endsWith('+',true))||
+                (resultText.text.endsWith('x',true))||(resultText.text.endsWith('/',true))||
+                (resultText.text.endsWith('.',true))) {
+                //if two contionuos operations are pressed
+                val toast = Toast.makeText(this, "can not press two operations together", Toast.LENGTH_LONG)
                 toast.show()
             }else if((resultText.text.contains('+')) ||
                 (resultText.text.contains('x')) || (resultText.text.contains('/'))){
@@ -117,9 +134,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        divideButton.setOnClickListener {
+        divideButton.setOnClickListener {//division
             if (resultText.length() <= 0) {
                 val toast = Toast.makeText(this, "can not press / without numbers", Toast.LENGTH_LONG)
+                toast.show()
+            }else if ((resultText.text.endsWith('-',true))||(resultText.text.endsWith('+',true))||
+                (resultText.text.endsWith('x',true))||(resultText.text.endsWith('/',true))||
+                (resultText.text.endsWith('.',true))) {
+                //if two contionuos operations are pressed
+                val toast = Toast.makeText(this, "can not press two operations together", Toast.LENGTH_LONG)
                 toast.show()
             }else if((resultText.text.contains('+')) ||
                 (resultText.text.contains('x')) || (resultText.text.contains('/'))){
@@ -195,7 +218,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         decimalButton.setOnClickListener {
-            resultText.append(".").toString()
+            if ((resultText.text.endsWith('-',true))||(resultText.text.endsWith('+',true))||
+                (resultText.text.endsWith('x',true))||(resultText.text.endsWith('/',true))||
+                (resultText.text.endsWith('.',true))   ) {
+                //if two contionuos operations are pressed
+                val toast = Toast.makeText(this, "can not press . after .,+,-,x,/", Toast.LENGTH_LONG)
+                toast.show()
+            }else{
+                resultText.append(".").toString()
+            }
         }
     }
 

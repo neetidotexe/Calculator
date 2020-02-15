@@ -23,7 +23,12 @@ class Calculation( private var context:Context) {
                 return 0.0
             }
         } else if (opr == 2) {//subtraction
-            val index: Int = expression.indexOf('-', 0, true)
+            val index: Int
+            if (expression.startsWith('-',true)){//for expressions starting with negative number
+                index = expression.indexOf('-', 1, true)
+            }else{
+                index = expression.indexOf('-', 0, true)
+            }
             expr1 = expression.substring(0, index).toDouble()
             expr2 = expression.substring(index + 1, expression.length).toDouble()
             try {
